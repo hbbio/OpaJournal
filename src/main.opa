@@ -26,7 +26,7 @@ type trigger =
 db /class : intmap(class)
 db /counter : stringmap(counter)
 db /events : list(event)
-db /trigger : list(trigger)
+db /triggers : list(trigger)
 
 Class = {{
   set(id, name) =
@@ -57,4 +57,5 @@ Event = {{
   add(class, user, description) =
     event <- { date = Date.now() ; ~class ; ~user ; ~description }
     do /events <- [ event | /events ]
+    do List.iter(Trigger.apply(event), /triggers)
 }}
