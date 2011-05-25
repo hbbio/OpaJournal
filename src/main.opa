@@ -15,7 +15,7 @@ type event =
      ; description : string
      }
 
-type condition = { classis : int } / { useris : string } / { before : Date.date } / { after : Date.date }
+type condition = { class : int } / { user : string } / { before : Date.date } / { after : Date.date }
 // TODO: and, or
 type clause = list(condition)
 // if clause then increment(counter)
@@ -39,6 +39,18 @@ Counter = {{
 }}
 
 Trigger = {{
+  check_condition(event, condition) =
+    match condition
+    | { ~class } -> class == event.class
+    | { ~user} -> user == event.user
+    | { ~before } -> event.date < before
+    | { ~after } -> event.date > after
+  check_clause(event, clause) =
+    f(condition, acc) = acc && check(event, condition)
+    List.fold(f, clause, true)
+  apply(event, trigger) =
+    if check_clause(event, trigger.clause) then
+      Counter.incr(trigger.counter)
 }}
 
 Event = {{
